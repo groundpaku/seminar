@@ -7,7 +7,7 @@ Created on 2026/05/07
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "postgresql+psycopg2://api_user01:rELi1001@172.20.63.23:5432/api_course"
+DATABASE_URL = "postgresql+psycopg2://{role名}:{パスワード}@{DBサーバーのIPアドレス}:{PostgreSQLのポート番号}/{DB名}"
 
 engine = create_engine(DATABASE_URL)
 

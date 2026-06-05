@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 
-
 ''' リクエストパラメータ '''
 class RequestAddStudent(BaseModel):
     name: str = Field(..., description="受講者名")
@@ -64,17 +63,6 @@ class ResponseStudent(BaseModel):
     model_config = {
         "from_attributes": True
     }
-    
-class JoinStudent(BaseModel):
-    student_id: int | None = Field(None, description="受講者ID")
-    delete_flg: str | None = Field(None, description="")
-    create_date: datetime | None = Field(None, description="")
-    update_date: datetime | None = Field(None, description="")
-    name: str | None = Field(None, description="受講者名")
-    name_kana: str | None = Field(None, description="受講者名かな")
-    joining_year: str | None = Field(None, description="入社年")
-    team_cd: str | None = Field(None, description="所属部コード")
-    team_name: str | None = Field(None, description="部署名")
 
 class ResponseSelectStudent2(BaseModel):
     result: bool = Field(..., description="結果")

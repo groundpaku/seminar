@@ -8,9 +8,7 @@ from routers import math, student
 
 app = FastAPI()
 
+# 以下にrouterを追加していく
 app.include_router(math.router)
 app.include_router(student.router)
 
-# @app.get("/hello")
-# def main():
-#     return {"result": "Hello, world!"}

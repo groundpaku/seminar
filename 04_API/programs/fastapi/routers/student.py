@@ -19,7 +19,6 @@ from schemas.schema_student import (
     ResponseSelectStudent2,
     RequestJoinStudent,
     ResponseJoinStudent,
-    JoinStudent,
     ResponseStudent,
     RequestUpdateStudent,
     ResponseUpdateStudent,
@@ -95,30 +94,33 @@ def selection2(data: RequestSelectStudent2, db: Session = Depends(get_db)):
         stmt = (
             select(M010_student)
             .where(M010_student.name.like(str(data.name) + "%"))
+            .order_by(M010_student.name_kana.desc())
             )
         m010_records = db.execute(stmt).scalars().all()
-        # m010_record = db.execute(stmt).scalar_one_or_none()
-        list_student = []
-        for m010 in m010_records:
-            list_student.append(
-                ResponseStudent(
-                    student_id=m010.student_id,
-                    name=m010.name,
-                    name_kana=m010.name_kana,
-                    joining_year=m010.joining_year,
-                    team_cd=m010.team_cd,
-                    delete_flg=m010.delete_flg,
-                    create_date=m010.create_date,
-                    update_date=m010.update_date
+        if m010_records is not None and len(m010_records) > 0:
+            list_student = []
+            for m010 in m010_records:
+                list_student.append(
+                    ResponseStudent(
+                        student_id=m010.student_id,
+                        name=m010.name,
+                        name_kana=m010.name_kana,
+                        joining_year=m010.joining_year,
+                        team_cd=m010.team_cd,
+                        delete_flg=m010.delete_flg,
+                        create_date=m010.create_date,
+                        update_date=m010.update_date
+                    )
                 )
-            )
-        return ResponseSelectStudent2(result=True,
-                                       message="",
-                                       student_list=list_student)
-        
+            return ResponseSelectStudent2(result=True,
+                                          message="",
+                                          student_list=list_student)
+        else:
+            return ResponseSelectStudent2(result=False, 
+                                       message="Student does not exist.")        
     except Exception as e:
-        return ResponseSelectStudent(result=False, 
-                                  message=(str(e)))
+        return ResponseSelectStudent2(result=False, 
+                                      message=(str(e)))
 
 ''' 検索(join) '''
 @router.post("/join", response_model=ResponseJoinStudent)
