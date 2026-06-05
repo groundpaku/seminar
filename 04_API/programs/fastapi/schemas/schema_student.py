@@ -27,13 +27,10 @@ class RequestUpdateStudent(BaseModel):
     name_kana: str = Field(None, description="受講者名かな")
     joining_year: str = Field(None, description="入社年")
     team_cd: str = Field(None, description="所属部コード")
-
-class RequestDeleteStudent(BaseModel):
-    student_id: int = Field(..., description="受講者ID")
     
 
 ''' レスポンスパラメータ '''
-class ResponseAddStudent(BaseModel):
+class ResponseResult(BaseModel):
     result: bool = Field(..., description="結果")
     message: str = Field(..., description="メッセージ")
 
@@ -66,12 +63,4 @@ class ResponseSelectStudentList(BaseModel):
     result: bool = Field(..., description="結果")
     message: str = Field(..., description="メッセージ")
     student_list: list[ResponseStudent] | None = Field(None, description="受講者リスト")
-
-class ResponseUpdateStudent(BaseModel):
-    result: bool = Field(..., description="結果")
-    message: str = Field(..., description="メッセージ")
-
-class ResponseDeleteStudent(BaseModel):
-    result: bool = Field(..., description="結果")
-    message: str = Field(..., description="メッセージ")
     

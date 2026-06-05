@@ -15,13 +15,10 @@ from schemas.schema_student import (
     RequestSelectStudentById,
     RequestSelectStudentByName,
     RequestUpdateStudent,
-    RequestDeleteStudent,
-    ResponseAddStudent,
+    ResponseResult,
     ResponseSelectStudent,    
     ResponseSelectStudentList,
     ResponseStudent,
-    ResponseUpdateStudent,
-    ResponseDeleteStudent
 )
 from models.m010_student import M010_student
 from models.m020_team import M020_team
@@ -39,7 +36,7 @@ def get_db():
         db.close()
 
 ''' 登録 '''
-@router.post("/add", response_model=ResponseAddStudent)
+@router.post("/add", response_model=ResponseResult)
 def addition(data: RequestAddStudent, db: Session = Depends(get_db)):
     try:
         datetime_today = datetime.datetime.today()
@@ -54,11 +51,10 @@ def addition(data: RequestAddStudent, db: Session = Depends(get_db)):
             )
         db.add(instance)
         db.commit()
-        return ResponseAddStudent(result=True, message="")
+        return ResponseResult(result=True, message="")
     except Exception as e:
         db.rollback()
-        print(e)
-        return ResponseAddStudent(result=False, message=(str(e)))
+        return ResponseResult(result=False, message=(str(e)))
 
 ''' 検索(ID) '''
 @router.post("/selectById", response_model=ResponseSelectStudent)
@@ -188,7 +184,7 @@ def relation(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
                                          message=(str(e)))
     
 ''' 更新 '''
-@router.post("/update", response_model=ResponseUpdateStudent)
+@router.post("/update", response_model=ResponseResult)
 def update(data: RequestUpdateStudent, db: Session = Depends(get_db)):
     try:
         stmt = (
@@ -196,7 +192,6 @@ def update(data: RequestUpdateStudent, db: Session = Depends(get_db)):
             .where(M010_student.student_id == data.student_id)
             )
         m010_record = db.execute(stmt).scalar_one_or_none()
-
         if m010_record is not None:
             datetime_today = datetime.datetime.today()
             m010_record.update_date = datetime_today
@@ -208,18 +203,17 @@ def update(data: RequestUpdateStudent, db: Session = Depends(get_db)):
                 m010_record.joining_year = data.joining_year
             if data.team_cd is not None:
                 m010_record.team_cd = data.team_cd
-            
             db.commit()
-            return ResponseUpdateStudent(result=True, message="")
+            return ResponseResult(result=True, message="")
         else:
-            return ResponseUpdateStudent(result=False, message="Student does not exist.")
+            return ResponseResult(result=False, message="Student does not exist.")
     except Exception as e:
         db.rollback()
-        return ResponseUpdateStudent(result=False, message=(str(e)))
+        return ResponseResult(result=False, message=(str(e)))
     
 ''' 削除 '''
-@router.post("/delete", response_model=ResponseDeleteStudent)
-def delete(data: RequestDeleteStudent, db: Session = Depends(get_db)):
+@router.post("/delete", response_model=ResponseResult)
+def delete(data: RequestSelectStudentById, db: Session = Depends(get_db)):
     try:
         stmt = (
             select(M010_student)
@@ -229,12 +223,10 @@ def delete(data: RequestDeleteStudent, db: Session = Depends(get_db)):
         if m010_record is not None:
             db.delete(m010_record)
             db.commit()
-            return ResponseDeleteStudent(result=True,
-                                         message="")
+            return ResponseResult(result=True, message="")
         else:
-            return ResponseDeleteStudent(result=False, 
-                                         message="Student does not exist.")
+            return ResponseResult(result=False, message="Student does not exist.")
     except Exception as e:
-        return ResponseDeleteStudent(result=False, 
-                                     message=(str(e)))
+        db.rollback()
+        return ResponseResult(result=False, message=(str(e)))
     
