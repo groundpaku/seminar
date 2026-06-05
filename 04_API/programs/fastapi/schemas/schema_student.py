@@ -15,10 +15,10 @@ class RequestAddStudent(BaseModel):
     joining_year: str = Field(..., description="入社年")
     team_cd: str = Field(..., description="所属部コード")
 
-class RequestSelectStudent(BaseModel):
+class RequestSelectStudentById(BaseModel):
     student_id: int = Field(..., description="受講者ID")
     
-class RequestSelectStudent2(BaseModel):
+class RequestSelectStudentByName(BaseModel):
     name: str = Field(..., description="受講者名")
 
 class RequestJoinStudent(BaseModel):
@@ -40,7 +40,7 @@ class ResponseAddStudent(BaseModel):
     result: bool = Field(..., description="結果")
     message: str = Field(..., description="メッセージ")
 
-class ResponseSelectStudent(BaseModel):
+class ResponseSelectStudentById(BaseModel):
     result: bool = Field(..., description="結果")
     message: str = Field(..., description="メッセージ")
     student_id: int = Field(None, description="受講者ID")
@@ -64,7 +64,7 @@ class ResponseStudent(BaseModel):
         "from_attributes": True
     }
 
-class ResponseSelectStudent2(BaseModel):
+class ResponseSelectStudentByName(BaseModel):
     result: bool = Field(..., description="結果")
     message: str = Field(..., description="メッセージ")
     student_list: list[ResponseStudent] | None = Field(None, description="受講者リスト")

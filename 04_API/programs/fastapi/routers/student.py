@@ -13,10 +13,10 @@ from db import SessionLocal
 from schemas.schema_student import (
     RequestAddStudent,
     ResponseAddStudent,
-    RequestSelectStudent,
-    ResponseSelectStudent,
-    RequestSelectStudent2,
-    ResponseSelectStudent2,
+    RequestSelectStudentById,
+    ResponseSelectStudentById,
+    RequestSelectStudentByName,
+    ResponseSelectStudentByName,
     RequestJoinStudent,
     ResponseJoinStudent,
     ResponseStudent,
@@ -26,8 +26,8 @@ from schemas.schema_student import (
     ResponseDeleteStudent
 )
 from models.m010_student import M010_student
-from sqlalchemy import select, and_
 from models.m020_team import M020_team
+from sqlalchemy import select, and_
 
 router = APIRouter(prefix="/student", tags=["student"])
 
@@ -54,7 +54,6 @@ def addition(data: RequestAddStudent, db: Session = Depends(get_db)):
             joining_year=data.joining_year,
             team_cd=data.team_cd,
             )
-
         db.add(instance)
         db.commit()
         return ResponseAddStudent(result=True, message="")
@@ -63,9 +62,9 @@ def addition(data: RequestAddStudent, db: Session = Depends(get_db)):
         print(e)
         return ResponseAddStudent(result=False, message=(str(e)))
 
-''' 検索 '''
-@router.post("/select", response_model=ResponseSelectStudent)
-def selection(data: RequestSelectStudent, db: Session = Depends(get_db)):
+''' 検索(ID) '''
+@router.post("/selectById", response_model=ResponseSelectStudentById)
+def selection(data: RequestSelectStudentById, db: Session = Depends(get_db)):
     try:
         stmt = (
             select(M010_student)
@@ -73,23 +72,23 @@ def selection(data: RequestSelectStudent, db: Session = Depends(get_db)):
             )
         m010_record = db.execute(stmt).scalar_one_or_none()
         if m010_record is not None:
-            return ResponseSelectStudent(result=True,
-                                         message="",
-                                         student_id=m010_record.student_id,
-                                         name=m010_record.name,
-                                         name_kana=m010_record.name_kana,
-                                         joining_year=m010_record.joining_year,
-                                         team_cd=m010_record.team_cd)
+            return ResponseSelectStudentById(result=True,
+                                             message="",
+                                             student_id=m010_record.student_id,
+                                             name=m010_record.name,
+                                             name_kana=m010_record.name_kana,
+                                             joining_year=m010_record.joining_year,
+                                             team_cd=m010_record.team_cd)
         else:
-            return ResponseSelectStudent(result=False, 
-                                      message="Student does not exist.")
+            return ResponseSelectStudentById(result=False, 
+                                             message="Student does not exist.")
     except Exception as e:
-        return ResponseSelectStudent(result=False, 
-                                  message=(str(e)))
+        return ResponseSelectStudentById(result=False, 
+                                         message=(str(e)))
 
-''' 検索 '''
-@router.post("/select2", response_model=ResponseSelectStudent)
-def selection2(data: RequestSelectStudent2, db: Session = Depends(get_db)):
+''' 検索(名前) '''
+@router.post("/selectByName", response_model=ResponseSelectStudentByName)
+def selection2(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
     try:
         stmt = (
             select(M010_student)
@@ -99,6 +98,7 @@ def selection2(data: RequestSelectStudent2, db: Session = Depends(get_db)):
         m010_records = db.execute(stmt).scalars().all()
         if m010_records is not None and len(m010_records) > 0:
             list_student = []
+            print(m010_records)
             for m010 in m010_records:
                 list_student.append(
                     ResponseStudent(
@@ -112,15 +112,15 @@ def selection2(data: RequestSelectStudent2, db: Session = Depends(get_db)):
                         update_date=m010.update_date
                     )
                 )
-            return ResponseSelectStudent2(result=True,
-                                          message="",
-                                          student_list=list_student)
+            return ResponseSelectStudentByName(result=True,
+                                               message="",
+                                               student_list=list_student)
         else:
-            return ResponseSelectStudent2(result=False, 
-                                       message="Student does not exist.")        
+            return ResponseSelectStudentByName(result=False, 
+                                               message="Student does not exist.")        
     except Exception as e:
-        return ResponseSelectStudent2(result=False, 
-                                      message=(str(e)))
+        return ResponseSelectStudentByName(result=False, 
+                                           message=(str(e)))
 
 ''' 検索(join) '''
 @router.post("/join", response_model=ResponseJoinStudent)
@@ -166,8 +166,8 @@ def join(data: RequestJoinStudent, db: Session = Depends(get_db)):
                                    message=(str(e)))
         
 ''' 検索(relation) '''
-@router.post("/relation", response_model=ResponseSelectStudent2)
-def relation(data: RequestSelectStudent2, db: Session = Depends(get_db)):
+@router.post("/relation", response_model=ResponseSelectStudentByName)
+def relation(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
     try:
         stmt = (
             select(M010_student)
@@ -179,15 +179,15 @@ def relation(data: RequestSelectStudent2, db: Session = Depends(get_db)):
             )
         m010_records = db.execute(stmt).scalars().all()
         if m010_records is not None and len(m010_records) > 0:
-            return ResponseSelectStudent2(result=True,
-                                          message="",
-                                          student_list=m010_records)
+            return ResponseSelectStudentByName(result=True,
+                                               message="",
+                                               student_list=m010_records)
         else:
-            return ResponseSelectStudent2(result=False, 
-                                          message="Student does not exist.")
+            return ResponseSelectStudentByName(result=False, 
+                                               message="Student does not exist.")
     except Exception as e:
-        return ResponseSelectStudent2(result=False, 
-                                      message=(str(e)))
+        return ResponseSelectStudentByName(result=False, 
+                                           message=(str(e)))
     
 ''' 更新 '''
 @router.post("/update", response_model=ResponseUpdateStudent)
