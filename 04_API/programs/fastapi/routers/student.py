@@ -8,6 +8,7 @@ import datetime
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import select, and_
 
 from db import SessionLocal
 from schemas.schema_student import (
@@ -22,7 +23,6 @@ from schemas.schema_student import (
 )
 from models.m010_student import M010_student
 from models.m020_team import M020_team
-from sqlalchemy import select, and_
 
 router = APIRouter(prefix="/student", tags=["student"])
 
