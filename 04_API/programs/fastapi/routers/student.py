@@ -185,24 +185,24 @@ def relation(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
     
 ''' 更新 '''
 @router.post("/update", response_model=ResponseResult)
-def update(data: (更新リクエスト用のSchema), db: Session = Depends(get_db)):
+def update(data: RequestUpdateStudent, db: Session = Depends(get_db)):
     try:
         stmt = (
             select(M010_student)
-            .where((検索条件))
+            .where(M010_student.student_id == data.student_id)
             )
         m010_record = db.execute(stmt).scalar_one_or_none()
         if m010_record is not None:
             datetime_today = datetime.datetime.today()
             m010_record.update_date = datetime_today
             if data.name is not None:
-                (取得したレコードのname) = (リクエストデータのname)
+                m010_record.name = data.name
             if data.name_kana is not None:
-                (取得したレコードのname_kana) = (リクエストデータのname_kana)
+                m010_record.name_kana = data.name_kana
             if data.joining_year is not None:
-                (取得したレコードのjoining) = (リクエストデータのjoining)
+                m010_record.joining = data.joining
             if data.team_cd is not None:
-                (取得したレコードのteam_cd) = (リクエストデータのteam_cd)
+                m010_record.team_cd = data.team_cd
             db.commit()
             return ResponseResult(result=True, message="")
         else:
@@ -217,11 +217,11 @@ def delete(data: RequestSelectStudentById, db: Session = Depends(get_db)):
     try:
         stmt = (
             select(M010_student)
-            .where((検索条件))
+            .where(M010_student.student_id == data.student_id)
             )
         m010_record = db.execute(stmt).scalar_one_or_none()
         if m010_record is not None:
-            db.delete((取得したレコード))
+            db.delete(m010_record)
             db.commit()
             return ResponseResult(result=True, message="")
         else:
