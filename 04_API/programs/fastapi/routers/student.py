@@ -92,7 +92,6 @@ def selection2(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
         m010_records = db.execute(stmt).scalars().all()
         if m010_records is not None and len(m010_records) > 0:
             list_student = []
-            print(m010_records)
             for m010 in m010_records:
                 list_student.append(
                     ResponseStudent(
