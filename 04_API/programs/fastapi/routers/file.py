@@ -34,9 +34,46 @@ def get_db():
     finally:
         db.close()
 
+''' CSVファイル読み込み '''
+@router.post("/read_csv", response_model=ResponseResult)
+def readCsv(data: RequestReadCsv, db: Session = Depends(get_db)):
+    try:
+        if os.path.exists(data.file_name):
+            # CSVファイルが存在する場合
+            with open(data.file_name, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+
+                for row in reader:
+                    instance = M010_student(
+                        delete_flg=int(row["delete_flg"]),
+                        create_date=(row["create_date"]),
+                        update_date=(
+                            (row["update_date"])
+                            if row["update_date"]
+                            else None
+                        ),
+                        name=row["name"],
+                        name_kana=row["name_kana"],
+                        joining_year=int(row["joining_year"]),
+                        team_cd=row["team_cd"]
+                    )
+                    db.add(instance)
+
+            db.commit()
+            return ResponseResult(result=True,
+                                  message="")
+        else:
+            return ResponseResult(result=False,
+                                  message=("ファイルが存在しません"))
+
+    except Exception as e:
+        db.rollback()
+        return ResponseResult(result=False,
+                              message=(str(e)))
+
 ''' CSV出力 '''
-@router.post("/get_new_csv", response_model=ResponseResult)
-def getNewCsv(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
+@router.post("/get_csv", response_model=ResponseResult)
+def getCsv(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
     try:
         ''' 検索条件 '''
         stmt = (
@@ -88,8 +125,8 @@ def getNewCsv(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
                               message=(str(e)))
 
 ''' CSV追記 '''
-@router.post("/get_add_csv", response_model=ResponseResult)
-def getAddCsv(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
+@router.post("/add_csv", response_model=ResponseResult)
+def addCsv(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
     try:
         ''' 検索条件 '''
         stmt = (
@@ -146,7 +183,7 @@ def getAddCsv(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
                               message=(str(e)))
     
 ''' CSV削除 '''
-@router.post("/get_delete_csv", response_model=ResponseResult)
+@router.post("/delete_csv", response_model=ResponseResult)
 def deleteCsv(db: Session = Depends(get_db)):
     try:
         if os.path.exists(csv_file):
@@ -162,39 +199,3 @@ def deleteCsv(db: Session = Depends(get_db)):
         return ResponseResult(result=False,
                               message=(str(e)))
     
-''' CSVファイル読み込み '''
-@router.post("/read_csv", response_model=ResponseResult)
-def readCsv(data: RequestReadCsv, db: Session = Depends(get_db)):
-    try:
-        if os.path.exists(data.file_name):
-            # CSVファイルが存在する場合
-            with open(data.file_name, "r", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-
-                for row in reader:
-                    instance = M010_student(
-                        delete_flg=int(row["delete_flg"]),
-                        create_date=(row["create_date"]),
-                        update_date=(
-                            (row["update_date"])
-                            if row["update_date"]
-                            else None
-                        ),
-                        name=row["name"],
-                        name_kana=row["name_kana"],
-                        joining_year=int(row["joining_year"]),
-                        team_cd=row["team_cd"]
-                    )
-                    db.add(instance)
-
-            db.commit()
-            return ResponseResult(result=True,
-                                  message="")
-        else:
-            return ResponseResult(result=False,
-                                  message=("ファイルが存在しません"))
-
-    except Exception as e:
-        db.rollback()
-        return ResponseResult(result=False,
-                              message=(str(e)))
