@@ -14,6 +14,7 @@ from sqlalchemy import select, and_
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 
 from db import SessionLocal
 from schemas.schema_student import (
@@ -211,7 +212,7 @@ def writePdf():
             UnicodeCIDFont("HeiseiKakuGo-W5")
         )
         # ファイル名
-        c = canvas.Canvas("test.pdf")
+        c = canvas.Canvas("test.pdf", pagesize=A4)
         # フォント、文字サイズ
         c.setFont("HeiseiKakuGo-W5", 14)
     
