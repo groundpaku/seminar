@@ -7,5 +7,5 @@ Created on 2026/06/19
 from pydantic import BaseModel, Field
 
 ''' リクエストパラメータ '''
-class RequestReadCsv(BaseModel):
-    file_name: str = Field(..., description="CSVファイル名")
+class RequestReadFile(BaseModel):
+    file_name: str = Field(..., description="ファイル名")

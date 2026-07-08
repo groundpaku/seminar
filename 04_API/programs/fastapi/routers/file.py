@@ -11,13 +11,17 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import select, and_
 
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+from reportlab.pdfgen import canvas
+
 from db import SessionLocal
 from schemas.schema_student import (
     RequestSelectStudentByName,
     ResponseResult,
     ResponseStudent,
 )
-from schemas.schema_file import RequestReadCsv
+from schemas.schema_file import RequestReadFile
 from models.m010_student import M010_student
 from models.m020_team import M020_team
 
@@ -36,7 +40,7 @@ def get_db():
 
 ''' CSVファイル読み込み '''
 @router.post("/read_csv", response_model=ResponseResult)
-def readCsv(data: RequestReadCsv, db: Session = Depends(get_db)):
+def readCsv(data: RequestReadFile, db: Session = Depends(get_db)):
     try:
         if os.path.exists(data.file_name):
             # CSVファイルが存在する場合
@@ -199,3 +203,29 @@ def deleteCsv(db: Session = Depends(get_db)):
         return ResponseResult(result=False,
                               message=(str(e)))
     
+''' PDF出力 '''
+@router.post("/write_pdf", response_model=ResponseResult)
+def writePdf():
+    try:
+        pdfmetrics.registerFont(
+            UnicodeCIDFont("HeiseiKakuGo-W5")
+        )
+        # ファイル名
+        c = canvas.Canvas("test.pdf")
+        # フォント、文字サイズ
+        c.setFont("HeiseiKakuGo-W5", 14)
+    
+        # 左揃え
+        c.drawString(100, 700, "左揃え")
+        # 中央揃え（x=300を中心）
+        c.drawCentredString(300, 650, "中央揃え")
+        # 右揃え（x=500で右端）
+        c.drawRightString(500, 600, "右揃え")
+
+        c.save()
+        return ResponseResult(result=True,
+                                  message="")
+
+    except Exception as e:
+        return ResponseResult(result=False,
+                              message=(str(e)))
