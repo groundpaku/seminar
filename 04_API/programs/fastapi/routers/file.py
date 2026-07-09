@@ -19,6 +19,7 @@ from reportlab.lib.pagesizes import A4
 from db import SessionLocal
 from schemas.schema_student import (
     RequestSelectStudentByName,
+    RequestSelectStudentById,
     ResponseResult,
     ResponseStudent,
 )
@@ -226,6 +227,56 @@ def writePdf():
         c.save()
         return ResponseResult(result=True,
                                   message="")
+
+    except Exception as e:
+        return ResponseResult(result=False,
+                              message=(str(e)))
+
+''' PDF出力 '''
+@router.post("/student_pdf", response_model=ResponseResult)
+def studentPdf(data: RequestSelectStudentById, db: Session = Depends(get_db)):
+    try:
+        ''' 検索条件 '''
+        stmt = (
+            select(M010_student, M020_team)
+            .join(M020_team, and_(M010_student.team_cd == M020_team.team_cd,
+                                  M020_team.delete_flg == "0"))
+            .where(M010_student.student_id == data.student_id,
+                   M010_student.delete_flg == "0")
+        )
+        ''' DB検索・レコード取得 '''
+        m010_record = db.execute(stmt).one_or_none()
+        if m010_record is not None:
+            m010, m020 = m010_record
+            student_id=m010.student_id
+            name=m010.name
+            name_kana=m010.name_kana
+            joining_year=m010.joining_year
+            team_name=m020.team_name
+
+            pdfmetrics.registerFont(
+                UnicodeCIDFont("HeiseiKakuGo-W5")
+            )
+            # ファイル名
+            c = canvas.Canvas(name + ".pdf", pagesize=A4)
+            # フォント、文字サイズ
+            c.setFont("HeiseiKakuGo-W5", 14)
+    
+            # 氏名
+            c.drawString(100, 700, "氏名：" + name)
+            # カナ
+            c.drawString(100, 650, "カナ：" + name_kana)
+            # 入社年
+            c.drawString(100, 600, "入社年：" + joining_year)
+            # 所属部署名
+            c.drawString(100, 550, "所属部署名：" + team_name)
+
+            c.save()
+            return ResponseResult(result=True,
+                                  message="")
+        else:
+            return ResponseResult(result=False,
+                                  message="該当の受講者が存在しません。")
 
     except Exception as e:
         return ResponseResult(result=False,
