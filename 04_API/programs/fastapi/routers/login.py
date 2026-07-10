@@ -72,11 +72,11 @@ def login(data: RequestLogin, db: Session = Depends(get_db)):
                 return ResponseLogin(result=False,
                                      message="Password mismatch.",
                                      token="")
-            # トークン生成
-            token = create_token(m010_record.name)
-            return ResponseLogin(result=True,
-                                 message="",
-                                 token=token)
+            else:# トークン生成
+                token = create_token(m010_record.name)
+                return ResponseLogin(result=True,
+                                     message="",
+                                     token=token)
         else:
             return ResponseLogin(result=False, 
                                  message="Student does not exist.",
