@@ -58,6 +58,11 @@ class M010_student(Base):
         ForeignKey("m020_team.team_cd"),
         nullable=False
     )
+
+    password_hash = Column(
+        String,
+        nullable=False
+    )
     
     team = relationship("M020_team", back_populates="students")
     

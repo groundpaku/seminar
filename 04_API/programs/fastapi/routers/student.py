@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, and_
 
 from db import SessionLocal
+from auth import verify_token
 from schemas.schema_student import (
     RequestAddStudent,
     RequestSelectStudentById,
@@ -82,7 +83,7 @@ def selection(data: RequestSelectStudentById, db: Session = Depends(get_db)):
 
 ''' 検索(名前) '''
 @router.post("/selectByName", response_model=ResponseSelectStudentList)
-def selection2(data: RequestSelectStudentByName, db: Session = Depends(get_db)):
+def selection2(data: RequestSelectStudentByName, db: Session = Depends(get_db), username: str = Depends(verify_token)):
     try:
         stmt = (
             select(M010_student)
