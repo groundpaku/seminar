@@ -53,9 +53,7 @@ def create_token(username: str):
 @router.post("/login", response_model=ResponseLogin)
 def login(data: RequestLogin, db: Session = Depends(get_db)):
     try:
-        # パスワードの暗号化
-        hashed_password = pwd_context.hash(data.password)
-        print(hashed_password)
+        # アカウント検索
         stmt = (
             select(M010_student)
             .where(and_(M010_student.student_id == data.student_id,
@@ -72,7 +70,8 @@ def login(data: RequestLogin, db: Session = Depends(get_db)):
                 return ResponseLogin(result=False,
                                      message="Password mismatch.",
                                      token="")
-            else:# トークン生成
+            else:
+                # トークン生成
                 token = create_token(m010_record.name)
                 return ResponseLogin(result=True,
                                      message="",
