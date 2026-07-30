@@ -21,18 +21,18 @@ def verify_token(
             algorithms=[ALGORITHM]
         )
 
-        username = payload.get("sub")
+        subject = payload.get("sub")
 
-        if username is None:
+        if subject is None:
             raise HTTPException(
                 status_code=401,
                 detail="Invalid token"
             )
 
-        return username
+        return subject
 
-    except JWTError:
-
+    except JWTError as e:
+        print(e)
         raise HTTPException(
             status_code=401,
             detail="Invalid token"

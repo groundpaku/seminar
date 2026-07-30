@@ -81,6 +81,30 @@ def selection(data: RequestSelectStudentById, db: Session = Depends(get_db)):
         return ResponseSelectStudent(result=False, 
                                      message=(str(e)))
 
+''' 検索(ID) '''
+@router.post("/selectByToken", response_model=ResponseSelectStudent)
+def selection(db: Session = Depends(get_db), student_id: str = Depends(verify_token)):
+    try:
+        stmt = (
+            select(M010_student)
+            .where(M010_student.student_id == int(student_id))
+            )
+        m010_record = db.execute(stmt).scalar_one_or_none()
+        if m010_record is not None:
+            return ResponseSelectStudent(result=True,
+                                         message="",
+                                         student_id=m010_record.student_id,
+                                         name=m010_record.name,
+                                         name_kana=m010_record.name_kana,
+                                         joining_year=m010_record.joining_year,
+                                         team_cd=m010_record.team_cd)
+        else:
+            return ResponseSelectStudent(result=False, 
+                                         message="Student does not exist.")
+    except Exception as e:
+        return ResponseSelectStudent(result=False, 
+                                     message=(str(e)))
+
 ''' 検索(名前) '''
 @router.post("/selectByName", response_model=ResponseSelectStudentList)
 def selection2(data: RequestSelectStudentByName, db: Session = Depends(get_db), username: str = Depends(verify_token)):
