@@ -6,7 +6,7 @@ Created on 2026/04/17
 from fastapi import FastAPI
 from routers import math, student, file, login
 
-app = FastAPI()
+app = FastAPI(root_path="/furuya")
 
 # 以下にrouterを追加していく
 app.include_router(math.router)
