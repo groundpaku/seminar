@@ -1,14 +1,47 @@
 ※コマンド中の氏名はサンプルです。自身のものに置き換えてください。
+※ポート番号は重複しないように注意してください。
+    青草    5001
+    山本    5002
+    正信    5003
+    岡田    5004
+    小阪田  5005
+    今西    5006
+    高野    5007
+    上山    5008
+    香々美  6001
+    森      7001
+    中村    7002
+    玉利    8001
+    津川    8002
 
-# プログラムの配備
+# FastAPIのサービス設定ファイルの作成
+※https://github.com/groundpaku/seminar/blob/main/04_API/server-setting/furuya_api.serviceを参考にして作成してください。
+
+# Nginx設定ファイルの作成
+※https://github.com/groundpaku/seminar/blob/main/04_API/server-setting/furuya.confを参考にして作成してください。
+
+# APIプログラムの配備
 WinSCP等のソフトを使用して、作成したファイルを作業ディレクトリに配備してください。
-・models
-・routers
-・schemas
-・auth.py
-・db.py
-・main.py
+配備先：/home/furuya
+ファイル：
+    ・models
+    ・routers
+    ・schemas
+    ・auth.py
+    ・db.py
+    ・main.py
 
+# サービス設定ファイルの配備
+WinSCP等のソフトを使用して、作成したファイルを下記ディレクトリに配備してください。
+配備先：/etc/systemd/system/
+ファイル：furuya_api.service
+
+# Nginx設定ファイルの配備
+WinSCP等のソフトを使用して、作成したファイルを下記ディレクトリに配備してください。
+配備先：/etc/nginx/default.d/
+ファイル：furuya.conf
+
+--- 以下、サーバーにログインして実行 ---
 # FastAPIの起動確認
 uvicorn main:app --host 0.0.0.0 --port 5001
 ※ポート番号は重複しないように注意してください。
@@ -27,20 +60,12 @@ uvicorn main:app --host 0.0.0.0 --port 5001
 津川　8002
 起動確認ができたら、Ctrl + Cで停止してください。
 
-# FastAPIのサービス設定ファイルの作成
-vim /etc/systemd/system/furuya_api.service
-※https://github.com/groundpaku/seminar/blob/main/04_API/server-setting/furuya_api.serviceを参考にして作成してください。
-
 # FastAPIのサービス起動
 systemctl daemon-reload
 systemctl start furuya_api.service
 systemctl status furuya_api.service
 ※activeになっていない場合は、設定ファイル等を見直してください。
 systemctl enable furuya_api.service
-
-# Nginxの設定
-vim /etc/nginx/default.d/furuya.conf
-※https://github.com/groundpaku/seminar/blob/main/04_API/server-setting/furuya.confを参考にして作成してください。
 
 # Nginxの再起動
 systemctl restart nginx.service
